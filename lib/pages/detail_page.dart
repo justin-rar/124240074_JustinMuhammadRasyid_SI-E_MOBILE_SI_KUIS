@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:kuis/models/stationery_item.dart';
 
 // DetailPage — StatefulWidget karena memiliki TextEditingController dan total live.
@@ -13,17 +13,27 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late final TextEditingController _dscController;
+  late final TextEditingController _prcController;
+  late final TextEditingController _stokController;
 
   @override
   void initState() {
     super.initState();
     _dscController = TextEditingController(text: widget.stationery.description);
+    _prcController = TextEditingController(
+      text: widget.stationery.price.toString(),
+    );
+    _stokController = TextEditingController(
+      text: widget.stationery.stock.toString(),
+    );
   }
 
   @override
   void dispose() {
     // Wajib dispose controller untuk menghindari memory leak
     _dscController.dispose();
+    _prcController.dispose();
+    _stokController.dispose();
     super.dispose();
   }
 
@@ -124,6 +134,17 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Harga per porsi
+                  Text(
+                    'Rp ${stationery.formattedPrice} / pcs',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
                   // Deskripsi
                   Text(
                     stationery.description,
@@ -138,7 +159,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
             const SizedBox(height: 16),
 
-            // Kartu input jumlah porsi
+            // ubah deskripsi
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -156,7 +177,7 @@ class _DetailPageState extends State<DetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Jumlah Pesanan',
+                    'Ubah Deskripsi',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -165,152 +186,107 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Baris input: tombol -, TextField, tombol +
-                  Row(
-                    children: [
-                      // Tombol kurang porsi
-                      _QtyButton(
-                        icon: Icons.remove,
-                        onPressed: () => _changeQty(-1),
+                  // TextField hanya angka, satu-satunya yang bisa diedit user
+                  TextField(
+                    controller: _dscController,
+                    maxLines: 10,
+                    decoration: InputDecoration(
+                      labelText: 'deskripsi',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(width: 12),
-
-                      // TextField hanya angka, satu-satunya yang bisa diedit user
-                      Expanded(
-                        child: TextField(
-                          controller: _dscController,
-                          keyboardType: TextInputType.text,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Jumlah (porsi)',
-                            prefixIcon: const Icon(
-                              Icons.dining,
-                              color: Colors.orange,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.orange,
-                                width: 2,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.orange.shade200,
-                              ),
-                            ),
-                          ),
-                          // Total berubah live saat angka diketik
-                          onChanged: (val) {
-                            final parsed = int.tryParse(val) ?? 0;
-                            final clamped = parsed.clamp(0, 99);
-                            setState(() => _currentQty = clamped);
-                          },
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.orange,
+                          width: 2,
                         ),
                       ),
-                      const SizedBox(width: 12),
-
-                      // Tombol tambah porsi
-                      _QtyButton(
-                        icon: Icons.add,
-                        onPressed: () => _changeQty(1),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.orange.shade200),
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(width: 10),
 
-                  // Baris total harga (live)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total',
+                  //ubah harga
+                  TextField(
+                    controller: _prcController,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: 'harga',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.orange,
+                          width: 2,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.orange.shade200),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  TextField(
+                    controller: _stokController,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: 'stok',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.orange,
+                          width: 2,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.orange.shade200),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        // Kembalikan nilai qty ke Beranda melalui pop
+                        Navigator.of(context).pop(_dscController.text);
+                      },
+                      icon: const Icon(Icons.store, color: Colors.white),
+                      label: const Text(
+                        'Simpan Perubahan',
                         style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
                         ),
                       ),
-                      Text(
-                        'Rp ${formatPrice(_totalPrice)}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        elevation: 2,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-
-            // Tombol simpan pemesanan — lebar penuh
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // Kembalikan nilai qty ke Beranda melalui pop
-                  Navigator.pop(context, _currentQty);
-                },
-                icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                label: const Text(
-                  'Simpan Perubahan',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// Tombol + dan - yang seragam — StatelessWidget
-class _QtyButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _QtyButton({required this.icon, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.orange.shade50,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          child: Icon(icon, color: Colors.deepOrange, size: 20),
         ),
       ),
     );
