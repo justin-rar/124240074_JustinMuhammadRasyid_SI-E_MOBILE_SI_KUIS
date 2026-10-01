@@ -12,36 +12,19 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  late final TextEditingController _qtyController;
-  int _currentQty = 0;
+  late final TextEditingController _dscController;
 
   @override
   void initState() {
     super.initState();
-    _currentQty = widget.stationery.stock;
-    _qtyController = TextEditingController(text: _currentQty.toString());
+    _dscController = TextEditingController(text: widget.stationery.description);
   }
 
   @override
   void dispose() {
     // Wajib dispose controller untuk menghindari memory leak
-    _qtyController.dispose();
+    _dscController.dispose();
     super.dispose();
-  }
-
-  // Hitung total secara live berdasarkan _currentQty
-  int get _totalPrice => _currentQty * widget.stationery.price;
-
-  // Tambah atau kurang porsi melalui tombol +/-
-  void _changeQty(int delta) {
-    final newVal = (_currentQty + delta).clamp(0, 99);
-    setState(() {
-      _currentQty = newVal;
-      _qtyController.text = newVal.toString();
-      _qtyController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _qtyController.text.length),
-      );
-    });
   }
 
   @override
@@ -114,6 +97,7 @@ class _DetailPageState extends State<DetailPage> {
 
             // Kartu detail makanan
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -138,18 +122,7 @@ class _DetailPageState extends State<DetailPage> {
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 4),
-
-                  // Harga per porsi
-                  Text(
-                    'Rp ${stationery.formattedPrice} / porsi',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
 
                   // Deskripsi
                   Text(
@@ -205,8 +178,8 @@ class _DetailPageState extends State<DetailPage> {
                       // TextField hanya angka, satu-satunya yang bisa diedit user
                       Expanded(
                         child: TextField(
-                          controller: _qtyController,
-                          keyboardType: TextInputType.number,
+                          controller: _dscController,
+                          keyboardType: TextInputType.text,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
